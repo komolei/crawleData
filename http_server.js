@@ -1,33 +1,52 @@
-// const http = require('http');
-// http.createServer((req,res)=>{
-//     res.setHeader('Content-Type','text/plain')
-//     res.writeHead(200,'it is ok');
-//     res.end('xxxxxxxxx');
-// }).listen(4000);
-
 const http = require('http')
-const server = http.createServer();
-server.listen(3000);
+const server = http.createServer()
 
+server.listen(3000)
 const qs = require('querystring')
-// let count=0;
+let resStr, count;
+let users = [];
 server.on('request', (req, res) => {
-    // count++;
-    // console.log('count is',count);
     const url = req.url;
-let resStr;
-
-const query = qs.parse(url.substr(url.indexOf(`?`)+1,url.length));
-
-console.log('query is',query);
+    const path = url.substring(0, url.indexOf(`?`))
+    const query = url.substr(url.indexOf(`?`) + 1, url.length)
+    const params = qs.parse(query);
+    console.log('params', params);
     res.statusCode = 200;
-if (url.indexOf('/hello')>-1) {
-    resStr = 'hello world';
-    if(query.yourname=='22'){
-        resStr='you are little'
+    const method = req.method;
+    const contentType = req.headers['content-type']
+    console.log(url, contentType);
+    switch (path) {
+        case `/hello`:
+            switch (method) {
+                case  `GET`:
+                    resStr = `hello world get method`
+                    break;
+                case `POST`:
+
+                    let resBody = '';
+                    req.on('data', data => {
+                        resBody += data.toString();
+                        console.log('data',resBody);
+
+                    })
+                    req.on('end', () => {
+                        if (contentType == `application/x-www-form-urlencoded`) {
+                            resStr = JSON.stringify(resBody);
+                        } else {
+                            res.statusCode = 400;
+                            resStr = `error `
+                        }
+                    })
+
+            }
+            res.end(resStr)
+            break;
+        case `/hi`:
+            res.end(resStr)
+            resStr = `hi my heart`
+        default:
+            res.statusCode = 500;
+            res.end('this service can\'t handle it')
     }
-} else {
-    resStr = 'no hello'
-}
-res.end(resStr)
+
 })
