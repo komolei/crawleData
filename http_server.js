@@ -3,7 +3,7 @@ const server = http.createServer()
 
 server.listen(3000)
 const qs = require('querystring')
-let resStr, count;
+let resStr, count=0;
 let users = [];
 server.on('request', (req, res) => {
     const url = req.url;
@@ -25,17 +25,21 @@ server.on('request', (req, res) => {
 
                     let resBody = '';
                     req.on('data', data => {
-                        resBody += data.toString();
-                        console.log('data',resBody);
+                        // resBody += data.toString();
+                        // console.log('data',resBody);
 
+                        count++;
+                        console.log(data);
                     })
                     req.on('end', () => {
-                        if (contentType == `application/x-www-form-urlencoded`) {
-                            resStr = JSON.stringify(resBody);
-                        } else {
-                            res.statusCode = 400;
-                            resStr = `error `
-                        }
+                        console.log('count is',count);
+
+                        // if (contentType == `application/x-www-form-urlencoded`) {
+                        //     resStr = JSON.stringify(resBody);
+                        // } else {
+                        //     res.statusCode = 400;
+                        //     resStr = `error `
+                        // }
                     })
 
             }
